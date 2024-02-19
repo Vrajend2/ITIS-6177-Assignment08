@@ -26,12 +26,6 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Sanitization middleware
-const sanitizeTodo = [
-  body("task").trim().escape(),
-  body("completed").toBoolean(),
-];
-
 // MariaDB connection pool configuration
 const mariadb = require('mariadb');
 const pool = mariadb.createPool({
@@ -42,7 +36,13 @@ const pool = mariadb.createPool({
   connectionLimit: 5,
 });
 
-// Sanitization, validation, and transformation middleware
+// Sanitization
+const sanitizeTodo = [
+  body("task").trim().escape(),
+  body("completed").toBoolean(),
+];
+
+// Customer sanitization
 const sanitizeCustomer = [
   body("customerCode").trim().escape(),
   body("customerName").trim().escape(),
@@ -51,10 +51,10 @@ const sanitizeCustomer = [
   body("customerCountry").trim().escape(),
   body("grade").trim().escape(),
   body("agentCode").trim().escape(),
-  body("completed").toBoolean(), // Transform completed to boolean
+  body("completed").toBoolean(),
 ];
 
-// Validation middleware
+// Customer validation
 const validateCustomer = [
   body("customerCode").notEmpty().withMessage("Customer code is required."),
   body("customerName").notEmpty().withMessage("Customer name is required."),
@@ -67,7 +67,7 @@ const validateCustomer = [
   body("agentCode").notEmpty().withMessage("Agent code is required."),
 ];
 
-// Validation and sanitization rules
+// Customer validation rules
 const updateCustomerValidationRules = [
   body("customerName").trim().notEmpty(),
   body("customerCity").trim().notEmpty(),
@@ -76,7 +76,7 @@ const updateCustomerValidationRules = [
 ];
 
 
-// Middleware to handle validation errors
+// Handle validation errors
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
